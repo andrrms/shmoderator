@@ -1,7 +1,7 @@
 import GameState from "./GameState";
 import { Code } from "../typings/errors";
 import { NewGameOptions } from "../typings/interfaces";
-import {User} from "@grammyjs/types";
+import { User } from "@grammyjs/types";
 
 export interface Events {
 	// Lobby events
@@ -35,7 +35,7 @@ export default class LobbyManager {
 		if (!LobbyManager.instance) {
 			LobbyManager.instance = new LobbyManager();
 		}
-			return LobbyManager.instance;
+		return LobbyManager.instance;
 	}
 
 	//*****************/
@@ -46,7 +46,7 @@ export default class LobbyManager {
 		this.events.set(event, callback);
 	}
 
-	protected event(name: keyof Events) {
+	protected fireEvent<T extends keyof Events>(name: T): Events[T] {
 		return this.events.get(name);
 	}
 
@@ -95,7 +95,7 @@ export default class LobbyManager {
 
 		if (this.debug) console.log(`[DEBUG] Started game at ${chat_id}`);
 
-		this.event("startRound")(chat_id, game.playersAsArray);
+		this.fireEvent("startRound")(chat_id, game.playersAsArray);
 		return true;
 	}
 
@@ -120,7 +120,7 @@ export default class LobbyManager {
 
 		// TODO: Implement joined player
 		// TODO: Emit joined player event
-		this.event('playerJoined')(chat_id, user);
+		this.fireEvent('playerJoined')(chat_id, user);
 		return true;
 	}
 }

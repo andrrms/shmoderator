@@ -1,7 +1,7 @@
-import {User} from "@grammyjs/types";
-import {GameUser, Preferences, Role, State} from "../typings/types";
-import {defaultPreferences, initialState} from "./defaults";
-import {Code} from "../typings/errors";
+import { User } from "@grammyjs/types";
+import { GameUser, Preferences, Role, State } from "../typings/types";
+import { defaultPreferences, initialState } from "./defaults";
+import { Code } from "../typings/errors";
 
 export default class GameState {
 	/** Map of GameUser representing players */
@@ -23,8 +23,8 @@ export default class GameState {
 		preferences?: Preferences
 	) {
 		this.preferences = preferences || defaultPreferences;
-		this.players     = new Map();
-		// implement serialization for saving this.state
+		this.players = new Map();
+		// TODO: implement serialization for saving this.state
 	}
 
 	//******************/

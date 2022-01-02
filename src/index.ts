@@ -1,7 +1,7 @@
-import {Bot} from "grammy";
-import {config} from "dotenv";
-import {Code} from "./typings/errors";
-import {manager} from "./logic";
+import { Bot } from "grammy";
+import { config } from "dotenv";
+import { Code } from "./typings/errors";
+import { manager } from "./logic";
 
 config();
 
@@ -58,6 +58,13 @@ bot.command("forcestart", async (ctx) => {
 		await ctx.reply("There are not enough players to start the game!");
 	}
 });
+
+bot.api.setMyCommands([
+	{ command: "start", description: "Display the start message" },
+	{ command: "new", description: "Create a new game" },
+	{ command: "join", description: "Join a game" },
+	{ command: "forcestart", description: "Force start a game" },
+]);
 
 bot.start({
 	onStart: (info) => {
