@@ -88,6 +88,7 @@ export interface State {
   /** `true` if the game started on group */
   started: boolean;
   started_at: number;
+  language: string;
   round: number;
   round_step: RoundStep;
 
@@ -152,6 +153,7 @@ export namespace Default {
   export const State: State = {
     started: false,
     started_at: Date.now(), // TODO: Bad?
+    language: "en",
     round: 0,
     round_step: RoundStep.Election,
 

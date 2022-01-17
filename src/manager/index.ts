@@ -1,6 +1,5 @@
-import LobbyManager, { Events } from "./Manager";
+import LobbyManager from "./Manager";
 
 const manager = LobbyManager.getInstance();
 
 export default manager;
-export { Events };

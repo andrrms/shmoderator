@@ -1,3 +1,4 @@
+import { GameError } from "../utils";
 import {
   GameUser,
   User,
@@ -17,6 +18,8 @@ export default class GameState {
   /** This represents the preferences of the
    * group where game is running */
   readonly preferences: Preferences;
+  /** Shortcut to `this.preferences.language` */
+  readonly lang: string;
 
   // TODO: Implement timers
   // TODO: Implement messages queue
@@ -29,6 +32,7 @@ export default class GameState {
   ) {
     this.preferences = preferences || Default.Preferences;
     this.players = new Map();
+    this.lang = this.preferences.language;
     // TODO: implement serialization for saving this.state
   }
 
@@ -36,8 +40,13 @@ export default class GameState {
   //* PLAYER METHODS */
   //******************/
   /** Returns the user object in game */
-  public findPlayer(user_id: number): GameUser | undefined {
-    return this.players.get(user_id);
+  public findPlayer(user_id: number): GameUser | undefined;
+  public findPlayer(user_id: number, throwError: boolean): GameUser;
+  public findPlayer(user_id: number, throwError?: boolean) {
+    const player = this.players.get(user_id);
+
+    if (throwError && !player) throw new GameError("PlayerNotFound", this.lang);
+    return player;
   }
 
   public get playersAsArray(): GameUser[] {
@@ -46,15 +55,12 @@ export default class GameState {
 
   /** Adds a player in game */
   public addPlayer(user: User) {
-    // TODO: Implement VIP system
-    const find = this.findPlayer(user.id);
-    if (find) return Code.ALREADY_EXISTS;
-    if (this.state.started) return Code.STARTED;
+    if (this.findPlayer(user.id))
+      throw new GameError("AlreadyJoined", this.lang);
+    if (this.state.started)
+      throw new GameError("CantJoinStartedGame", this.lang);
     if (this.players.size >= this.preferences.player_limit)
-      return Code.LIMIT_REACHED;
-
-    if (this.debug)
-      console.log(`[DEBUG] Adding player ${user.id} to game ${this.group_id}`);
+      throw new GameError("LobbyIsFull", this.lang);
 
     const usr: GameUser = {
       id: user.id,
@@ -67,34 +73,24 @@ export default class GameState {
     };
 
     this.players.set(user.id, usr);
-
-    return usr;
   }
 
   /** Removes a player from game */
   public removePlayer(user_id: number) {
-    if (this.state.started && !this.preferences.can_flee) return Code.STARTED;
+    if (this.state.started && !this.preferences.can_flee)
+      throw new GameError("CantFleeRunningGame", this.lang);
+    if (!this.findPlayer(user_id))
+      throw new GameError("PlayerNotFound", this.lang);
 
-    const find = this.findPlayer(user_id);
-    if (!find) return Code.NOT_FOUND;
-
-    if (this.debug)
-      console.log(`[DEBUG] ${find.first_name} left game at ${this.group_id}`);
-
-    return this.players.delete(user_id);
+    this.players.delete(user_id);
   }
 
   /** Kills a player in game */
   public killPlayer(user_id: number) {
-    const find = this.findPlayer(user_id);
-    if (!find) return Code.NOT_FOUND;
-    if (find.is_dead) return Code.ALREADY_DEAD;
-
-    if (this.debug)
-      console.log(`[DEBUG] Killing player ${user_id} in game ${this.group_id}`);
+    const find = this.findPlayer(user_id, true);
+    if (find.is_dead) throw new GameError("AlreadyDead", this.lang);
 
     find.is_dead = true;
-    return true;
   }
 
   //******************/
@@ -102,7 +98,7 @@ export default class GameState {
   //******************/
   /** Sort roles on game */
   public sortRoles() {
-    if (!this.state.started) return Code.NOT_STARTED;
+    if (!this.state.started) throw new GameError("NotStarted", this.lang);
 
     let fas = 0;
     if (this.players.size >= 5) fas = 1;
@@ -151,14 +147,11 @@ export default class GameState {
   }
 
   public start() {
-    if (this.state.started) return Code.STARTED;
-    if (this.players.size < 5) return Code.NOT_ENOUGH_PLAYERS;
-
-    if (this.debug) console.log(`[DEBUG] Starting game at ${this.group_id}`);
+    if (this.state.started) throw new GameError("AlreadyRunning", this.lang);
+    if (this.players.size < 5)
+      throw new GameError("NotEnoughPlayers", this.lang);
 
     this.state.started = true;
     this.sortRoles();
-
-    return true;
   }
 }

@@ -1,0 +1,21 @@
+{
+  "errors": {
+    "GameNotFound": "Não existe um jogo ativo neste grupo.",
+    "GameFound": "Já existe um jogo em andamento.",
+    "PlayerNotFound": "Jogador não encontrado",
+    "PlayerInAnotherGame": "Você já está jogando em outro grupo.",
+    "AlreadyJoined": "Você já está jogando.",
+    "AlreadyRunning": "O jogo já começou.",
+    "AlreadyDead": "O jogador já está morto.",
+    "CantFleeRunningGame": "Você não pode fugir de um jogo em andamento.",
+    "CantJoinStartedGame": "Você não pode entrar no meio de um jogo.",
+    "LobbyIsFull": "O jogo que você tentou entrar já está cheio.",
+    "NotEnoughPlayers": "Não existem jogadores suficientes para começar a partida.",
+    "NotStarted": "NotStarted message",
+    "Started": "Started message"
+  },
+  "messages": {
+    "GameCreated": "Uma nova partida foi iniciada. Use /join para jogar.",
+    "PlayerJoined": "${user.first_name} se juntou a partida."
+  }
+}

@@ -1,21 +1,15 @@
-import { User, Chat } from "@grammyjs/types";
-import { Router } from "@grammyjs/router";
+import { User } from "@grammyjs/types";
 
 import bot, { MyContext } from "../bot";
 import { NewGameOptions } from "./interfaces";
-import GameState, { Code, GameUser } from "../state";
-
-export interface Events {
-  //=== Lobby events
-  startRound: (chat_id: number, users: Array<GameUser>) => void;
-  //=== Player events
-  playerJoined: (chat_id: number, user: User) => void;
-}
+import GameState from "../state";
+import { GameError } from "../utils";
+import { Default } from "../state/interfaces";
+import i18n from "../locales";
 
 export default class LobbyManager {
   private static instance: LobbyManager;
   private games: Map<number, GameState>;
-  readonly routers: Map<string, Router<MyContext>> = new Map();
 
   readonly started_at: Date;
   debug: boolean;
@@ -41,28 +35,30 @@ export default class LobbyManager {
   }
 
   //*****************/
-  //* EVENT METHODS */
-  //*****************/
-  events: Map<keyof Events, (...data: any) => any> = new Map();
-  public on(event: keyof Events, callback: Events[keyof Events]) {
-    this.events.set(event, callback);
-  }
-
-  protected fireEvent<T extends keyof Events>(name: T): Events[T] {
-    return this.events.get(name) as Events[T];
-  }
-
-  //*****************/
   //* LOBBY METHODS */
   //*****************/
-  findGame(game_id: number): GameState | undefined {
-    return this.games.get(game_id);
+  findGame(game_id: number, lang?: string): GameState | undefined;
+  findGame(game_id: number, lang: string, throwError: boolean): GameState;
+  findGame(game_id: number, lang: string = "en", throwError?: boolean) {
+    const game = this.games.get(game_id);
+    if (throwError && !game) throw new GameError("GameNotFound", lang);
+    return game;
   }
 
-  createGame(chat_id: number, options?: NewGameOptions) {
-    if (this.findGame(chat_id)) return Code.ALREADY_EXISTS;
+  async createGame(chat_id: number, options?: NewGameOptions) {
+    const lang = options?.language || Default.Preferences.language;
 
-    this.games.set(chat_id, new GameState(chat_id, this.debug));
+    if (this.findGame(chat_id)) throw new GameError("GameNotFound", lang);
+
+    this.games.set(
+      chat_id,
+      new GameState(chat_id, this.debug, {
+        language: lang,
+        can_flee: Default.Preferences.can_flee,
+        player_limit: Default.Preferences.player_limit,
+        timers: Default.Preferences.timers,
+      })
+    );
 
     if (this.debug) console.log(`[DEBUG] Created game at ${chat_id}`);
 
@@ -72,31 +68,26 @@ export default class LobbyManager {
 
     // TODO: Impl joined interval messaging
     // TODO: Impl advice for infinite lobby
-    return true;
+    await bot.api.sendMessage(chat_id, i18n.t(lang, "messages.GameCreated"));
   }
 
   destroyGame(chat_id: number) {
+    // TODO: Remove unused var
     const game = this.findGame(chat_id);
-    if (!game) return Code.NOT_FOUND;
+    if (!game) throw new GameError("GameNotFound");
 
     this.games.delete(chat_id);
 
     if (this.debug) console.log(`[DEBUG] Ended game at ${chat_id}`);
 
     // TODO: Impl timer clear
-    return game;
   }
 
-  async startGame(chat_id: number) {
+  async startGame(chat_id: number): Promise<void> {
     const game = this.findGame(chat_id);
-    if (!game)
-      return await bot.api.sendMessage(chat_id, "There is no game running");
+    if (!game) throw new GameError("GameNotFound");
 
-    const start = game.start();
-    if (start === Code.STARTED)
-      return await bot.api.sendMessage(chat_id, "Game already started");
-    if (start === Code.NOT_ENOUGH_PLAYERS)
-      return await bot.api.sendMessage(chat_id, "Not enough players");
+    game.start();
 
     if (this.debug) console.log(`[DEBUG] Started game at ${chat_id}`);
 
@@ -107,31 +98,33 @@ export default class LobbyManager {
         "Your game started at " + ("title" in (await bot.api.getChat(chat_id)))
       );
     });
-    return true;
   }
 
   //******************/
   //* PLAYER METHODS */
   //******************/
-  public joinPlayerIntoGame(chat_id: number, user: User) {
+  public async joinPlayerIntoGame(chat_id: number, user: User) {
     const game = this.findGame(chat_id);
-    if (!game) return Code.NOT_FOUND;
+    if (!game) throw new GameError("GameNotFound");
 
     let has_joined = false;
     this.games.forEach((game) => {
-      if (game.players.get(user.id)) has_joined = true;
+      if (game.players.get(user.id) && game.group_id !== chat_id)
+        has_joined = true;
     });
 
-    if (has_joined) return Code.ALREADY_EXISTS;
+    if (has_joined) throw new GameError("PlayerInAnotherGame");
 
-    const add = game.addPlayer(user);
-    if (add === Code.ALREADY_EXISTS) return Code.ALREADY_EXISTS;
-    if (add === Code.LIMIT_REACHED) return Code.LIMIT_REACHED;
-    if (add === Code.STARTED) return Code.STARTED;
+    game.addPlayer(user);
+
+    if (this.debug)
+      console.log(`[DEBUG] Adding player ${user.id} to game ${chat_id}`);
 
     // TODO: Implement joined player
     // TODO: Emit joined player event
-    this.fireEvent("playerJoined")(chat_id, user);
-    return true;
+    await bot.api.sendMessage(
+      chat_id,
+      i18n.t(game.lang, "messages.PlayerJoined", { user })
+    );
   }
 }

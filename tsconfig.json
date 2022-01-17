@@ -5,6 +5,7 @@
 
     /* Modules */
     "module": "commonjs",
+    "resolveJsonModule": true,
 
     /* Emit */
     "outDir": "./dist",                                   /* Specify an output folder for all emitted files. */

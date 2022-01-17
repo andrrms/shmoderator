@@ -5,7 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@grammyjs/emoji": "^1.0.0",
-    "@grammyjs/router": "^1.1.1",
+    "@grammyjs/i18n": "^0.5.1",
     "dotenv": "^14.1.0",
     "envalid": "^7.2.2",
     "grammy": "^1.6.2"

@@ -1,0 +1,21 @@
+{
+  "errors": {
+    "GameNotFound": "There is no running game in this group.",
+    "GameFound": "There is already a running game in this group.",
+    "PlayerNotFound": "PlayerNotFound message",
+    "PlayerInAnotherGame": "You are already playing in another game.",
+    "AlreadyJoined": "You already joined this game.",
+    "AlreadyRunning": "The game is already started.",
+    "AlreadyDead": "The player is already dead.",
+    "CantFleeRunningGame": "You can't flee from a runnning game",
+    "CantJoinStartedGame": "You can't join in the middle of a game.",
+    "LobbyIsFull": "The game you're trying to join is already full.",
+    "NotEnoughPlayers": "There is not enough players to start the game.",
+    "NotStarted": "NotStarted message",
+    "Started": "Started message"
+  },
+  "messages": {
+    "GameCreated": "A new game has been started. Use /join to enter.",
+    "PlayerJoined": "${user.first_name} joined the game."
+  }
+}
