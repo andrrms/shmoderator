@@ -1,3 +1,3 @@
 export interface NewGameOptions {
-	timer: boolean;
+  timer: boolean;
 }
