@@ -6,7 +6,6 @@ import {
   Preferences,
   Default,
   Role,
-  Code,
 } from "./interfaces";
 
 export default class GameState {

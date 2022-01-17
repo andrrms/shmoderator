@@ -1,11 +1,10 @@
 import { User } from "@grammyjs/types";
 
-import bot, { MyContext } from "../bot";
-import { NewGameOptions } from "./interfaces";
-import GameState from "../state";
-import { GameError } from "../utils";
-import { Default } from "../state/interfaces";
+import bot from "../bot";
 import i18n from "../locales";
+import GameState, { Default } from "../state";
+import { NewGameOptions } from "./interfaces";
+import { GameError } from "../utils";
 
 export default class LobbyManager {
   private static instance: LobbyManager;
