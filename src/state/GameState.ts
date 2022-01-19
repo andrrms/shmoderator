@@ -78,8 +78,7 @@ export default class GameState {
   public removePlayer(user_id: number) {
     if (this.state.started && !this.preferences.can_flee)
       throw new GameError("CantFleeRunningGame", this.lang);
-    if (!this.findPlayer(user_id))
-      throw new GameError("PlayerNotFound", this.lang);
+    this.findPlayer(user_id, true);
 
     this.players.delete(user_id);
   }
