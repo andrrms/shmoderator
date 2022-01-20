@@ -1,9 +1,10 @@
 import { Composer } from "grammy";
+import { Payload } from "../utils";
 
 const composer = new Composer();
 
 composer.on("message").command("start", async (ctx) => {
-  const [intention, ...data] = decodeURIComponent(ctx.match).toLocaleLowerCase().split(":");
+  const [intention, ...data] = Payload.decode(ctx.match).toLocaleLowerCase().split(":");
   console.log(intention, data);
   
   if (intention) {
