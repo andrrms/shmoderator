@@ -5,6 +5,7 @@ import i18n from "../locales";
 import GameState, { Default } from "../state";
 import { NewGameOptions } from "./interfaces";
 import { GameError } from "../utils";
+import { InlineKeyboard } from "grammy";
 
 export default class LobbyManager {
   private static instance: LobbyManager;
@@ -67,7 +68,16 @@ export default class LobbyManager {
 
     // TODO: Impl joined interval messaging
     // TODO: Impl advice for infinite lobby
-    await bot.api.sendMessage(chat_id, i18n.t(lang, "messages.GameCreated"));
+    
+    // We do this to force player to start a conversation
+    // with the bot, since we need to send further messages
+    // to the user
+    await bot.api.sendMessage(chat_id, i18n.t(lang, "messages.GameCreated"), {
+      reply_markup: new InlineKeyboard()
+        .url(i18n.t(lang, "buttons.JoinGame"), `https://t.me/${bot.botInfo.username}?start=${encodeURIComponent(`join:${chat_id}`)}`)
+    });
+
+    console.log(encodeURIComponent(`join:${chat_id}`));
   }
 
   destroyGame(chat_id: number) {

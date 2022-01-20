@@ -1,4 +1,4 @@
-import { cleanEnv, num, str } from "envalid";
+import { cleanEnv, num, str, bool } from "envalid";
 import { config } from "dotenv";
 
 config();
@@ -6,4 +6,5 @@ config();
 export default cleanEnv(process.env, {
   TOKEN: str(),
   ADMIN_ID: num(),
+  DEBUG: bool(),
 });

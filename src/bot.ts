@@ -5,7 +5,7 @@ import { I18nContextFlavor } from "@grammyjs/i18n";
 import env from "./env";
 import i18n from "./locales";
 
-import { standardCommands, lobbyCommands } from "./commands";
+import { standardCommands, lobbyCommands, callbackListener } from "./handlers";
 
 export type MyContext = Context & EmojiFlavor & I18nContextFlavor;
 const bot = new Bot<MyContext>(env.TOKEN);
@@ -17,6 +17,9 @@ bot.use(i18n.middleware());
 // Install commands
 bot.use(standardCommands);
 bot.use(lobbyCommands);
+
+// Install handlers
+bot.use(callbackListener);
 
 // Set commands
 bot.api.setMyCommands(

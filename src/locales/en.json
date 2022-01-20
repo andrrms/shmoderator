@@ -15,7 +15,10 @@
     "Started": "Started message"
   },
   "messages": {
-    "GameCreated": "A new game has been started. Use /join to enter.",
+    "GameCreated": "A new game has been started. Use the button below to join.",
     "PlayerJoined": "${user.first_name} joined the game."
+  },
+  "buttons": {
+    "JoinGame": "Join game"
   }
 }

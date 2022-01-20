@@ -15,7 +15,10 @@
     "Started": "Started message"
   },
   "messages": {
-    "GameCreated": "Uma nova partida foi iniciada. Use /join para jogar.",
+    "GameCreated": "Uma nova partida foi iniciada. Use o botão abaixo para jogar.",
     "PlayerJoined": "${user.first_name} se juntou a partida."
+  },
+  "buttons": {
+    "JoinGame": "Entrar na partida"
   }
 }
