@@ -1,7 +1,7 @@
-import enLocale from "./locales/en.json";
+import defaultLocale from "./locales/en.json";
 import i18n from "./locales";
 
-export type Errors = keyof typeof enLocale["errors"];
+export type Errors = keyof typeof defaultLocale["errors"];
 
 export class GameError extends Error {
   constructor(
